@@ -1,16 +1,7 @@
 # MeetOpt — Meeting Optimization System
 
-> Minimize meetings. Maximize relevance.
-
 MeetOpt is a lightweight, single-file web app that helps managers reduce meeting overload by intelligently grouping projects based on shared Points of Contact (POCs). Instead of scheduling one meeting per project, MeetOpt calculates the **minimum number of valid meetings** where every attendee is relevant to every discussion.
 
----
-
-## Live Demo
-
-Deploy instantly via GitHub Pages — no build step, no dependencies, no server required.
-
----
 
 ## The Problem
 
@@ -104,65 +95,3 @@ Agenda:     Update on Project Gamma
 
 *(Alpha and Beta both set to "1 mandatory → P1"; Gamma set to "ALL attend")*
 
----
-
-## Deployment
-
-### GitHub Pages (recommended)
-
-1. Fork or clone this repository
-2. Ensure `index.html` is in the root of the `main` branch
-3. Go to **Settings → Pages → Source → Deploy from branch**
-4. Select `main` branch, `/ (root)` folder
-5. Click **Save** — your app will be live at `https://<username>.github.io/<repo>`
-
-### Local
-
-No build step needed. Just open the file directly:
-
-```bash
-open index.html
-# or
-python3 -m http.server 8080
-```
-
----
-
-## Project Structure
-
-```
-meetopt/
-├── index.html    # Entire application — HTML, CSS, and JS in one file
-└── README.md
-```
-
-MeetOpt is intentionally a **single self-contained file** for easy deployment, sharing, and auditing.
-
----
-
-## Tech Stack
-
-| Layer | Choice |
-|---|---|
-| Framework | Vanilla HTML/CSS/JS — no dependencies |
-| Fonts | DM Sans, DM Mono, Instrument Serif (Google Fonts) |
-| Algorithm | Greedy grouping with strict relevance constraint |
-| Deployment | GitHub Pages (static) |
-
----
-
-## Contributing
-
-Contributions are welcome. Some areas for improvement:
-
-- **Export to calendar** — generate `.ics` files for each optimized meeting
-- **Drag-to-reorder** projects before optimization
-- **Save/load** project configurations via JSON export
-- **Conflict detection** — flag when no valid grouping exists across all projects
-- **Time slot suggestions** — integrate with calendar APIs
-
----
-
-## License
-
-MIT — free to use, modify, and deploy.
