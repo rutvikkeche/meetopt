@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MeetOpt — Meeting Optimization System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #fafafa;
+    --gray-100: #f4f4f4;
+    --gray-200: #e8e8e8;
+    --gray-400: #999;
+    --gray-600: #555;
+    --gray-800: #222;
+    --accent: #0a0a0a;
+    --radius: 2px;
+    --border: 1px solid var(--gray-200);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--black);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: var(--border);
+    padding: 0 48px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(250,250,250,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--black);
+  }
+  .logo span {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .header-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 64px 32px 120px;
+  }
+
+  /* HERO */
+  .hero {
+    margin-bottom: 64px;
+    padding-bottom: 48px;
+    border-bottom: var(--border);
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--black);
+    margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gray-600);
+  }
+  .hero p {
+    font-size: 15px;
+    color: var(--gray-600);
+    max-width: 520px;
+    line-height: 1.7;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
+  }
+
+  /* PROJECT CARDS */
+  #projects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .project-card {
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.15s;
+    animation: slideIn 0.2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .project-card:hover { border-color: var(--gray-400); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--gray-100);
+    border-bottom: var(--border);
+  }
+  .card-index {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    min-width: 24px;
+  }
+  .card-header input[type="text"] {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--black);
+    outline: none;
+  }
+  .card-header input::placeholder { color: var(--gray-400); font-weight: 400; }
+  .remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray-400);
+    font-size: 18px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .remove-btn:hover { color: var(--black); background: var(--gray-200); }
+
+  .card-body {
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* POC row */
+  .poc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .poc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-width: 36px;
+  }
+  .poc-input-wrap {
+    flex: 1;
+    min-width: 160px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .poc-input-wrap input[type="text"] {
+    flex: 1;
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 7px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--black);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .poc-input-wrap input:focus { border-color: var(--black); }
+  .poc-input-wrap input::placeholder { color: var(--gray-400); }
+  .add-poc-btn {
+    background: none;
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 6px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--gray-600);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .add-poc-btn:hover { border-color: var(--black); color: var(--black); background: var(--gray-100); }
+
+  /* POC Tags */
+  .poc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 28px;
+  }
+  .poc-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    cursor: default;
+    animation: tagIn 0.15s ease;
+  }
+  @keyframes tagIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .poc-tag button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    margin-left: 1px;
+    transition: color 0.1s;
+  }
+  .poc-tag button:hover { color: var(--white); }
+
+  /* Mode Row */
+  .mode-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .mode-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    min-width: 36px;
+  }
+  .mode-toggle {
+    display: flex;
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .mode-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--gray-600);
+    transition: all 0.15s;
+    border-right: var(--border);
+    user-select: none;
+  }
+  .mode-toggle label span { color: inherit; }
+  .mode-toggle label:last-child { border-right: none; }
+  .mode-toggle input[type="radio"] { display: none; }
+  .mode-toggle label:has(input:checked) {
+    background: var(--black);
+    color: var(--white);
+  }
+  .mode-toggle label:has(input:checked) span {
+    color: var(--white);
+  }
+  .mode-hint {
+    font-size: 12px;
+    color: var(--gray-400);
+    flex: 1;
+    min-width: 200px;
+  }
+
+  /* Mandatory select */
+  .mandatory-select-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mandatory-select-row .mode-label { min-width: 80px; }
+  .styled-select {
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 6px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--black);
+    background: var(--white);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 24px;
+  }
+  .styled-select:focus { border-color: var(--black); }
+
+  /* BUTTONS */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .btn-secondary {
+    background: var(--white);
+    border-color: var(--gray-200);
+    color: var(--gray-600);
+  }
+  .btn-secondary:hover { border-color: var(--black); color: var(--black); }
+  .btn-primary {
+    background: var(--black);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--gray-800); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  /* OUTPUT SECTION */
+  #output-section {
+    margin-top: 48px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+  }
+  #output-section.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .output-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .output-summary {
+    font-family: 'Instrument Serif', serif;
+    font-size: 24px;
+    color: var(--black);
+  }
+  .output-summary strong { color: var(--black); font-weight: 400; }
+  .output-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    letter-spacing: 0.06em;
+  }
+
+  /* MEETING CARDS */
+  .meetings-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .meeting-card {
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: cardReveal 0.35s ease both;
+  }
+  @keyframes cardReveal {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .meeting-card-head {
+    background: var(--black);
+    color: var(--white);
+    padding: 16px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .meeting-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+  .meeting-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .meeting-card-body {
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 560px) {
+    .meeting-card-body { grid-template-columns: 1fr; }
+  }
+
+  .meeting-field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 8px;
+  }
+  .meeting-field-value {
+    font-size: 13px;
+    color: var(--black);
+    line-height: 1.8;
+  }
+
+  .invite-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .invite-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border: var(--border);
+    border-radius: 100px;
+    color: var(--black);
+  }
+  .invite-chip.host {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+  }
+
+  .discussion-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .discussion-list li {
+    font-size: 13px;
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .discussion-list li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gray-400);
+    flex-shrink: 0;
+  }
+
+  .projects-covered {
+    font-size: 13px;
+    line-height: 1.8;
+  }
+
+  /* HOST FIELD */
+  .host-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border-top: var(--border);
+    background: var(--gray-100);
+  }
+  .host-section .meeting-field-label { margin-bottom: 0; }
+  .host-section .invite-chip.host { }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--gray-400);
+  }
+  .empty-state p {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--gray-400);
+  }
+  .empty-state span {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  /* COPY BUTTON */
+  .copy-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 6px 14px;
+    background: none;
+    border: var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--gray-400);
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { border-color: var(--black); color: var(--black); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ERROR */
+  .error-msg {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #c0392b;
+    padding: 10px 16px;
+    border: 1px solid #f5c6cb;
+    border-radius: var(--radius);
+    background: #fff5f5;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    header { padding: 0 20px; }
+    main { padding: 40px 20px 80px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Meet<span>Opt</span></div>
+  <div class="header-tag">Meeting Optimization System</div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">v1.0 — Manager's Toolkit</div>
+    <h1>Fewer meetings.<br/><em>Better coverage.</em></h1>
+    <p>Add your projects and their points of contact. The system calculates the minimum number of meetings needed to keep everyone aligned — no redundancy, no overlap.</p>
+  </section>
+
+  <!-- PROJECTS -->
+  <div class="section-label">Projects</div>
+  <div id="projects-container"></div>
+
+  <div class="btn-row" style="margin-bottom: 16px;">
+    <button class="btn btn-secondary" onclick="addProject()">+ Add Project</button>
+  </div>
+
+  <div id="error-msg" class="error-msg"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="optimize()">Optimize Meetings →</button>
+    <button class="btn btn-secondary" onclick="resetAll()">Reset</button>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="output-section">
+    <div class="output-header">
+      <div class="output-summary" id="output-summary"></div>
+      <button class="copy-btn" onclick="copyOutput()">Copy Plan</button>
+    </div>
+    <div id="meetings-grid" class="meetings-grid"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let projectCount = 0;
+
+  function addProject(name = '', pocs = [], mode = 'all', mandatory = '') {
+    projectCount++;
+    const id = projectCount;
+    const container = document.getElementById('projects-container');
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.id = `project-${id}`;
+    card.dataset.pocs = JSON.stringify(pocs);
+    card.dataset.mode = mode;
+    card.dataset.mandatory = mandatory;
+
+    card.innerHTML = `
+      <div class="card-header">
+        <span class="card-index">#${String(id).padStart(2,'0')}</span>
+        <input type="text" placeholder="Project name…" value="${escHtml(name)}" oninput="updateProjectName(${id}, this.value)" />
+        <button class="remove-btn" onclick="removeProject(${id})" title="Remove">×</button>
+      </div>
+      <div class="card-body">
+        <div class="poc-row">
+          <span class="poc-label">POCs</span>
+          <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+            <div class="poc-tags" id="tags-${id}"></div>
+            <div class="poc-input-wrap">
+              <input type="text" id="poc-input-${id}" placeholder="Add name, press Enter…"
+                onkeydown="handlePocKey(event, ${id})"
+                oninput="this.value = this.value.replace(/,/g, '')"/>
+              <button class="add-poc-btn" onclick="addPocFromInput(${id})">+ Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="mode-row">
+          <span class="mode-label">Mode</span>
+          <div class="mode-toggle">
+            <label>
+              <input type="radio" name="mode-${id}" value="all" onchange="updateMode(${id},'all')" ${mode==='all'?'checked':''}>
+              <span>ALL attend</span>
+            </label>
+            <label>
+              <input type="radio" name="mode-${id}" value="one" onchange="updateMode(${id},'one')" ${mode==='one'?'checked':''}>
+              <span>1 mandatory</span>
+            </label>
+          </div>
+          <span class="mode-hint" id="mode-hint-${id}"></span>
+        </div>
+        <div id="mandatory-row-${id}" class="mandatory-select-row" style="display:none;">
+          <span class="mode-label">Mandatory POC</span>
+          <select class="styled-select" id="mandatory-select-${id}" onchange="updateMandatory(${id}, this.value)">
+            <option value="">— choose —</option>
+          </select>
+        </div>
+      </div>`;
+
+    container.appendChild(card);
+    // Render existing pocs
+    pocs.forEach(p => renderTag(id, p));
+    updateMode(id, mode, false);
+    if (mandatory) card.dataset.mandatory = mandatory;
+  }
+
+  function escHtml(str) {
+    return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  function updateProjectName(id, val) { /* name is read from input at optimize time */ }
+
+  function removeProject(id) {
+    const el = document.getElementById(`project-${id}`);
+    if (el) el.remove();
+  }
+
+  function handlePocKey(e, id) {
+    if (e.key === 'Enter') { e.preventDefault(); addPocFromInput(id); }
+  }
+
+  function addPocFromInput(id) {
+    const input = document.getElementById(`poc-input-${id}`);
+    const name = input.value.trim();
+    if (!name) return;
+    const card = document.getElementById(`project-${id}`);
+    const pocs = JSON.parse(card.dataset.pocs);
+    if (pocs.includes(name)) { input.value = ''; return; }
+    pocs.push(name);
+    card.dataset.pocs = JSON.stringify(pocs);
+    renderTag(id, name);
+    input.value = '';
+    syncMandatorySelect(id);
+  }
+
+  function renderTag(id, name) {
+    const tags = document.getElementById(`tags-${id}`);
+    const tag = document.createElement('span');
+    tag.className = 'poc-tag';
+    tag.id = `tag-${id}-${name}`;
+    tag.innerHTML = `${escHtml(name)}<button onclick="removePoc(${id}, '${escHtml(name)}')" title="Remove">×</button>`;
+    tags.appendChild(tag);
+  }
+
+  function removePoc(id, name) {
+    const card = document.getElementById(`project-${id}`);
+    let pocs = JSON.parse(card.dataset.pocs);
+    pocs = pocs.filter(p => p !== name);
+    card.dataset.pocs = JSON.stringify(pocs);
+    const tag = document.getElementById(`tag-${id}-${name}`);
+    if (tag) tag.remove();
+    // If this was mandatory, clear
+    if (card.dataset.mandatory === name) card.dataset.mandatory = '';
+    syncMandatorySelect(id);
+  }
+
+  function updateMode(id, mode, sync = true) {
+    const card = document.getElementById(`project-${id}`);
+    card.dataset.mode = mode;
+    const hintEl = document.getElementById(`mode-hint-${id}`);
+    const mandRow = document.getElementById(`mandatory-row-${id}`);
+    if (mode === 'all') {
+      hintEl.textContent = 'All POCs must attend this meeting.';
+      mandRow.style.display = 'none';
+    } else {
+      hintEl.textContent = 'Only one POC is required — choose who.';
+      mandRow.style.display = 'flex';
+      if (sync) syncMandatorySelect(id);
+    }
+  }
+
+  function syncMandatorySelect(id) {
+    const card = document.getElementById(`project-${id}`);
+    const pocs = JSON.parse(card.dataset.pocs);
+    const sel = document.getElementById(`mandatory-select-${id}`);
+    const cur = card.dataset.mandatory;
+    sel.innerHTML = '<option value="">— choose —</option>';
+    pocs.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p; opt.textContent = p;
+      if (p === cur) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
+
+  function updateMandatory(id, val) {
+    const card = document.getElementById(`project-${id}`);
+    card.dataset.mandatory = val;
+  }
+
+  // ---- OPTIMIZATION LOGIC ----
+  function optimize() {
+    hideError();
+    const projectCards = document.querySelectorAll('.project-card');
+    if (projectCards.length === 0) { showError('Add at least one project before optimizing.'); return; }
+
+    const projects = [];
+    for (const card of projectCards) {
+      const nameInput = card.querySelector('input[type="text"]');
+      const name = nameInput.value.trim() || `Project ${card.id.split('-')[1]}`;
+      const pocs = JSON.parse(card.dataset.pocs);
+      const mode = card.dataset.mode;
+      const mandatory = card.dataset.mandatory;
+
+      if (pocs.length === 0) { showError(`"${name}" has no POCs. Add at least one.`); return; }
+      if (mode === 'one' && !mandatory) { showError(`"${name}" is set to 1 mandatory POC but none is selected.`); return; }
+
+      projects.push({ name, pocs, mode, mandatory });
+    }
+
+    const meetings = buildMeetings(projects);
+    renderOutput(meetings, projects.length);
+  }
+
+  function buildMeetings(projects) {
+    // Determine "representative" poc for each project (for grouping)
+    // For mode=all  → key poc set is all pocs
+    // For mode=one  → key poc set is [mandatory]
+    // We group projects that share at least one common key poc
+    // Use Union-Find to merge overlapping groups
+
+    const n = projects.length;
+    const parent = Array.from({length: n}, (_, i) => i);
+
+    function find(x) { return parent[x] === x ? x : (parent[x] = find(parent[x])); }
+    function union(a, b) { parent[find(a)] = find(b); }
+
+    // Gather key pocs per project
+    function keyPocs(p) {
+      return p.mode === 'all' ? p.pocs : [p.mandatory];
+    }
+
+    for (let i = 0; i < n; i++) {
+      for (let j = i + 1; j < n; j++) {
+        const ki = new Set(keyPocs(projects[i]));
+        const kj = new Set(keyPocs(projects[j]));
+        const hasOverlap = [...kj].some(p => ki.has(p));
+        if (hasOverlap) union(i, j);
+      }
+    }
+
+    // Group by root
+    const groups = {};
+    for (let i = 0; i < n; i++) {
+      const root = find(i);
+      if (!groups[root]) groups[root] = [];
+      groups[root].push(i);
+    }
+
+    // Build meeting objects
+    const meetings = [];
+    for (const root of Object.keys(groups)) {
+      const indices = groups[root];
+      const coveredProjects = indices.map(i => projects[i]);
+
+      // Invite: union of all pocs in covered projects
+      const inviteSet = new Set();
+      coveredProjects.forEach(p => p.pocs.forEach(poc => inviteSet.add(poc)));
+      const invite = [...inviteSet].sort();
+
+      // Host: poc that appears in most projects, or first key poc of first project
+      const pocFreq = {};
+      coveredProjects.forEach(p => p.pocs.forEach(poc => { pocFreq[poc] = (pocFreq[poc] || 0) + 1; }));
+      const host = invite.reduce((a, b) => pocFreq[a] >= pocFreq[b] ? a : b);
+
+      meetings.push({
+        projects: coveredProjects.map(p => p.name),
+        invite,
+        host,
+        discussion: coveredProjects.map(p => `Update on ${p.name}`)
+      });
+    }
+
+    // Sort by number of projects desc
+    meetings.sort((a, b) => b.projects.length - a.projects.length);
+    return meetings;
+  }
+
+  function renderOutput(meetings, totalProjects) {
+    const outSection = document.getElementById('output-section');
+    const grid = document.getElementById('meetings-grid');
+    const summary = document.getElementById('output-summary');
+
+    grid.innerHTML = '';
+    const saved = totalProjects - meetings.length;
+    summary.innerHTML = `<strong>${meetings.length}</strong> meeting${meetings.length > 1 ? 's' : ''} cover${meetings.length === 1 ? 's' : ''} all ${totalProjects} project${totalProjects > 1 ? 's' : ''}` +
+      (saved > 0 ? ` — <em style="font-style:italic;color:var(--gray-600)">${saved} meeting${saved>1?'s':''} saved</em>` : '');
+
+    meetings.forEach((m, i) => {
+      const card = document.createElement('div');
+      card.className = 'meeting-card';
+      card.style.animationDelay = `${i * 0.07}s`;
+
+      const inviteChips = m.invite.map(p =>
+        `<span class="invite-chip${p === m.host ? ' host' : ''}">${escHtml(p)}${p === m.host ? ' ★' : ''}</span>`
+      ).join('');
+
+      const discussionItems = m.discussion.map(d => `<li>${escHtml(d)}</li>`).join('');
+      const projectsList = m.projects.map(p => escHtml(p)).join(', ');
+
+      card.innerHTML = `
+        <div class="meeting-card-head">
+          <span class="meeting-num">Meeting ${String(i+1).padStart(2,'0')}</span>
+          <span class="meeting-title">${m.projects.length > 1 ? m.projects.length + ' projects' : m.projects[0]}</span>
+        </div>
+        <div class="meeting-card-body">
+          <div>
+            <div class="meeting-field-label">Projects Covered</div>
+            <div class="projects-covered meeting-field-value">${projectsList}</div>
+          </div>
+          <div>
+            <div class="meeting-field-label">Discussion Agenda</div>
+            <ul class="discussion-list">${discussionItems}</ul>
+          </div>
+          <div>
+            <div class="meeting-field-label">Invite</div>
+            <div class="invite-list">${inviteChips}</div>
+          </div>
+        </div>
+        <div class="host-section">
+          <span class="meeting-field-label" style="margin-right:8px;">Host</span>
+          <span class="invite-chip host">${escHtml(m.host)} ★</span>
+        </div>`;
+
+      grid.appendChild(card);
+    });
+
+    outSection.classList.add('visible');
+    setTimeout(() => outSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+
+  function copyOutput() {
+    const meetings = document.querySelectorAll('.meeting-card');
+    if (!meetings.length) return;
+    let text = '=== MEETING OPTIMIZATION PLAN ===\n\n';
+    meetings.forEach((card, i) => {
+      const title = card.querySelector('.meeting-title').textContent.trim();
+      const projects = card.querySelector('.projects-covered').textContent.trim();
+      const host = card.querySelector('.host-section .invite-chip').textContent.replace(' ★','').trim();
+      const invite = [...card.querySelectorAll('.invite-list .invite-chip')].map(c => c.textContent.replace(' ★','').trim()).join(', ');
+      const discussion = [...card.querySelectorAll('.discussion-list li')].map(li => '  • ' + li.textContent.trim()).join('\n');
+      text += `Meeting ${i+1}: ${title}\n`;
+      text += `Host: ${host}\n`;
+      text += `Projects: ${projects}\n`;
+      text += `Invite: ${invite}\n`;
+      text += `Agenda:\n${discussion}\n\n`;
+    });
+    navigator.clipboard.writeText(text.trim()).then(() => showToast('Copied to clipboard'));
+  }
+
+  function resetAll() {
+    document.getElementById('projects-container').innerHTML = '';
+    projectCount = 0;
+    const out = document.getElementById('output-section');
+    out.classList.remove('visible');
+    hideError();
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function hideError() {
+    document.getElementById('error-msg').classList.remove('show');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  // SEED default example
+  addProject('Project Alpha', ['P1', 'P2', 'P3'], 'all');
+  addProject('Project Beta', ['P1', 'P4', 'P2'], 'all');
+  addProject('Project Gamma', ['P4', 'P3'], 'all');
+</script>
+</body>
+</html>
