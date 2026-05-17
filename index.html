@@ -780,10 +780,10 @@
     const hintEl = document.getElementById(`mode-hint-${id}`);
     const mandRow = document.getElementById(`mandatory-row-${id}`);
     if (mode === 'all') {
-      hintEl.textContent = 'All POCs must attend this meeting.';
+      hintEl.textContent = 'All POCs attend. Projects merge only if all attendees are shared POCs.';
       mandRow.style.display = 'none';
     } else {
-      hintEl.textContent = 'Only one POC is required — choose who.';
+      hintEl.textContent = 'Only this POC attends on behalf of the project.';
       mandRow.style.display = 'flex';
       if (sync) syncMandatorySelect(id);
     }
@@ -833,65 +833,66 @@
   }
 
   function buildMeetings(projects) {
-    // Determine "representative" poc for each project (for grouping)
-    // For mode=all  → key poc set is all pocs
-    // For mode=one  → key poc set is [mandatory]
-    // We group projects that share at least one common key poc
-    // Use Union-Find to merge overlapping groups
+    // STRICT RELEVANCE RULE:
+    // A meeting is only valid if every attendee is a POC of EVERY project discussed.
+    // Nobody sits through a discussion they have no involvement in.
+    //
+    // Effective POCs (who attends):
+    //   ALL mode → all POCs attend
+    //   ONE mode → only the mandatory POC attends
+    //
+    // Two projects can share a meeting only if their combined attendee list
+    // are ALL POCs of both projects. i.e. effective(A)∪effective(B) ⊆ pocs(A)∩pocs(B)
 
-    const n = projects.length;
-    const parent = Array.from({length: n}, (_, i) => i);
-
-    function find(x) { return parent[x] === x ? x : (parent[x] = find(parent[x])); }
-    function union(a, b) { parent[find(a)] = find(b); }
-
-    // Gather key pocs per project
-    function keyPocs(p) {
+    function effectivePocs(p) {
       return p.mode === 'all' ? p.pocs : [p.mandatory];
     }
 
-    for (let i = 0; i < n; i++) {
-      for (let j = i + 1; j < n; j++) {
-        const ki = new Set(keyPocs(projects[i]));
-        const kj = new Set(keyPocs(projects[j]));
-        const hasOverlap = [...kj].some(p => ki.has(p));
-        if (hasOverlap) union(i, j);
+    function canMergeIntoGroup(group, newP) {
+      const combined = [...group, newP];
+      const allAttendees = new Set(combined.flatMap(p => effectivePocs(p)));
+      for (const attendee of allAttendees) {
+        for (const proj of combined) {
+          if (!proj.pocs.includes(attendee)) return false;
+        }
       }
+      return true;
     }
 
-    // Group by root
-    const groups = {};
-    for (let i = 0; i < n; i++) {
-      const root = find(i);
-      if (!groups[root]) groups[root] = [];
-      groups[root].push(i);
+    // Greedy grouping: place each project in the first valid group, else new group
+    const groups = [];
+    for (const proj of projects) {
+      let placed = false;
+      for (const group of groups) {
+        if (canMergeIntoGroup(group, proj)) {
+          group.push(proj);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) groups.push([proj]);
     }
 
-    // Build meeting objects
     const meetings = [];
-    for (const root of Object.keys(groups)) {
-      const indices = groups[root];
-      const coveredProjects = indices.map(i => projects[i]);
-
-      // Invite: union of all pocs in covered projects
+    for (const group of groups) {
       const inviteSet = new Set();
-      coveredProjects.forEach(p => p.pocs.forEach(poc => inviteSet.add(poc)));
+      group.forEach(p => effectivePocs(p).forEach(poc => inviteSet.add(poc)));
       const invite = [...inviteSet].sort();
 
-      // Host: poc that appears in most projects, or first key poc of first project
       const pocFreq = {};
-      coveredProjects.forEach(p => p.pocs.forEach(poc => { pocFreq[poc] = (pocFreq[poc] || 0) + 1; }));
+      invite.forEach(poc => {
+        pocFreq[poc] = group.filter(p => p.pocs.includes(poc)).length;
+      });
       const host = invite.reduce((a, b) => pocFreq[a] >= pocFreq[b] ? a : b);
 
       meetings.push({
-        projects: coveredProjects.map(p => p.name),
+        projects: group.map(p => p.name),
         invite,
         host,
-        discussion: coveredProjects.map(p => `Update on ${p.name}`)
+        discussion: group.map(p => `Update on ${p.name}`)
       });
     }
 
-    // Sort by number of projects desc
     meetings.sort((a, b) => b.projects.length - a.projects.length);
     return meetings;
   }
@@ -912,7 +913,7 @@
       card.style.animationDelay = `${i * 0.07}s`;
 
       const inviteChips = m.invite.map(p =>
-        `<span class="invite-chip${p === m.host ? ' host' : ''}">${escHtml(p)}${p === m.host ? ' ★' : ''}</span>`
+        `<span class="invite-chip">${escHtml(p)}</span>`
       ).join('');
 
       const discussionItems = m.discussion.map(d => `<li>${escHtml(d)}</li>`).join('');
@@ -937,10 +938,7 @@
             <div class="invite-list">${inviteChips}</div>
           </div>
         </div>
-        <div class="host-section">
-          <span class="meeting-field-label" style="margin-right:8px;">Host</span>
-          <span class="invite-chip host">${escHtml(m.host)} ★</span>
-        </div>`;
+`;
 
       grid.appendChild(card);
     });
